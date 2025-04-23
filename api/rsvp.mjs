@@ -1,14 +1,11 @@
-const { createClient } = require('@supabase/supabase-js');
+import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-console.log('🔍 Supabase URL:', supabaseUrl);
-console.log('🔍 Supabase Key present:', !!supabaseKey);
-
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -25,12 +22,18 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
     }
 
-    console.log('📩 Submitting RSVP:', { name, email, plus_one });
-
     const { error } = await supabase
       .from('rsvps')
       .insert([{ name, email, message, plus_one }]);
 
     if (error) {
-      console.error('❌ Supabase insert error:', error.message);
-      return res.status(500).json({ success: false
+      console.error('❌ Supabase error:', error.message);
+      return res.status(500).json({ success: false, error: error.message });
+    }
+
+    return res.status(200).json({ success: true });
+  } catch (err) {
+    console.error('❌ Server crash:', err.message);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
