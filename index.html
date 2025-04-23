@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>You're Invited</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="hero">
+    <img src="your-image.jpg" alt="Event Image" />
+    <div class="overlay">
+      <h1>Mutual Core Launch</h1>
+      <p>Saturday, May 10 · 5–8PM · Kingston, NY</p>
+      <a href="#rsvp" class="btn">RSVP Now</a>
+    </div>
+  </div>
+
+  <div class="content">
+    <h2>About the Event</h2>
+    <p>Join us for a quiet unveiling among friends — an opportunity to experience our ceramic loudspeakers up close, hear the sound they hold, and celebrate the years of work behind them.</p>
+    
+    <h3>Location</h3>
+    <p>45 Pine Grove Avenue, Kingston, NY</p>
+    <iframe src="https://maps.google.com/maps?q=45 Pine Grove Ave, Kingston, NY&output=embed" frameborder="0" class="map"></iframe>
+    
+    <div id="rsvp">
+      <h3>RSVP</h3>
+      <form>
+        <input type="text" name="name" placeholder="Your name" required />
+        <input type="email" name="email" placeholder="Your email" required />
+        <textarea name="message" placeholder="Anything we should know?" rows="3"></textarea>
+        <button type="submit">Confirm RSVP</button>
+      </form>
+
+      <div id="thank-you" class="fade" style="display: none; margin-top: 1em;">
+        <p>Thank you for RSVPing! We’re excited to see you there.</p>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+    const supabase = createClient(
+      'https://einixxudtbxnrmgrnexd.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpbml4eHVkdGJ4bnJtZ3JuZXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyODM2OTMsImV4cCI6MjA2MDg1OTY5M30.JWbg2KXdDiSmToYik4IpSH48hY9komsZYcSZ_uKUXwA'
+    )
+
+    const form = document.querySelector('form')
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+
+      const name = form.name.value.trim()
+      const email = form.email.value.trim()
+      const message = form.message.value.trim()
+
+      const { error } = await supabase
+        .from('rsvps')
+        .insert([{ name, email, message }])
+
+      if (error) {
+        console.error('Supabase error:', error)
+        alert('Something went wrong: ' + error.message)
+      } else {
+        // send confirmation email via MailerSend API route
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email })
+        })
+
+        // show thank you message
+        form.style.display = 'none'
+        const thankYou = document.getElementById('thank-you')
+        thankYou.style.display = 'block'
+        setTimeout(() => {
+          thankYou.classList.add('show')
+        }, 10)
+      }
+    })
+  </script>
+</body>
+</html>
