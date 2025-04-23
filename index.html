@@ -85,7 +85,7 @@
       text-align: center;
     }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 0.6em;
       margin-bottom: 0.8em;
@@ -93,18 +93,6 @@
       border: 1px solid #ccc;
       border-radius: 0;
       font-family: 'Inconsolata', monospace;
-    }
-
-    label {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 16px;
-      margin-bottom: 1em;
-    }
-
-    label input[type="checkbox"] {
-      margin-right: 0.5em;
     }
 
     button {
@@ -119,7 +107,7 @@
     }
 
     #rsvp-container {
-      min-height: 320px;
+      min-height: 340px;
     }
 
     #rsvp-response {
@@ -179,10 +167,16 @@
           <input type="email" name="email" placeholder="Your email" required />
           <textarea name="message" placeholder="Write your message here (Optional)" rows="3"></textarea>
 
-          <label>
-            <input type="checkbox" id="plus-one" />
-            I'm going to bring a +1
+          <label for="guest-count" style="font-size: 16px; display: block; margin-bottom: 1em;">
+            Number of guests (including you):
           </label>
+          <select id="guest-count" name="guest-count">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
 
           <button type="submit">Confirm RSVP</button>
         </form>
@@ -211,12 +205,12 @@
       const name = form.name.value.trim();
       const email = form.email.value.trim();
       const message = form.message.value.trim();
-      const plusOne = document.getElementById('plus-one').checked;
+      const guestCount = parseInt(document.getElementById('guest-count').value, 10);
 
       const supabaseRes = await fetch('/api/rsvp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message, plus_one: plusOne })
+        body: JSON.stringify({ name, email, message, guest_count: guestCount })
       });
 
       const supabaseResult = await supabaseRes.json();
