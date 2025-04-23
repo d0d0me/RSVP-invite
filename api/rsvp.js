@@ -27,11 +27,13 @@ module.exports = async function handler(req, res) {
       .insert([{ name, email, message, plus_one }]);
 
     if (error) {
+      console.error('❌ Supabase insert error:', error.message);
       return res.status(500).json({ success: false, error: error.message });
     }
 
     return res.status(200).json({ success: true });
   } catch (err) {
+    console.error('❌ Server crash:', err.message);
     return res.status(500).json({ success: false, error: err.message });
   }
 };
