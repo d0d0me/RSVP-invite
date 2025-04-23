@@ -2,98 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>You're Invited</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="hero">
-    <img src="your-image.jpg" alt="Event Image" />
-    <div class="overlay">
-      <h1>Mutual Core Launch</h1>
-      <p>Saturday, May 10 · 5–8PM · Kingston, NY</p>
-      <a href="#rsvp" class="btn">RSVP Now</a>
-    </div>
-  </div>
-
-  <div class="content">
-    <h2>About the Event</h2>
-    <p>Join us for a quiet unveiling among friends — an opportunity to experience our ceramic loudspeakers up close, hear the sound they hold, and celebrate the years of work behind them.</p>
-    
-    <h3>Location</h3>
-    <p>45 Pine Grove Avenue, Kingston, NY</p>
-    <iframe src="https://maps.google.com/maps?q=45 Pine Grove Ave, Kingston, NY&output=embed" frameborder="0" class="map"></iframe>
-    
-    <div id="rsvp">
-      <h3>RSVP</h3>
-      <form id="rsvp-form" style="margin-top: 1em;">
-  <input type="text" name="name" placeholder="Your name" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
-  <input type="email" name="email" placeholder="Your email" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
-  <textarea name="message" placeholder="Anything we should know?" rows="3" style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;"></textarea>
-  
-  <label style="display: flex; align-items: center; font-size: 16px; margin-bottom: 1em;">
-    <input type="checkbox" id="plus-one" style="margin-right: 0.5em;" />
-    I'm going to bring a +1
-  </label>
-  
-  <button type="submit" style="padding: 0.7em 1.2em; background: black; color: white; border: none; font-size: 16px; cursor: pointer;">
-    Confirm RSVP
-  </button>
-</form>
-
-<p id="rsvp-response" style="margin-top: 1em; color: green; display: none;"></p>
-
-<hr style="margin: 2em 0;" />
-
-<div style="font-size: 16px;">
-  <p>I can't attend this launch but I would love to schedule a private listening.</p>
-  <a href="mailto:hello@limpatience.com?subject=I'd like to schedule a private listening of your speakers Mutual Core"
-     style="display: inline-block; padding: 0.7em 1.2em; background: white; color: black; border: 1px solid black; border-radius: 4px; text-decoration: none;">
-    Email us to schedule
-  </a>
-</div>
-
-<script>
-  const form = document.getElementById('rsvp-form');
-  const responseEl = document.getElementById('rsvp-response');
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-    const plusOne = document.getElementById('plus-one').checked;
-
-    // Send RSVP to Supabase
-    const supabaseRes = await fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message, plus_one: plusOne })
-    });
-
-    const supabaseResult = await supabaseRes.json();
-
-    if (!supabaseResult.success) {
-      responseEl.style.color = 'red';
-      responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
-      responseEl.style.display = 'block';
-      return;
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSVP – Mutual Core Launch</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f8f8f8;
+      color: #222;
+      padding: 2em;
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    // Send confirmation email via MailerSend
-    await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email })
+    form {
+      margin-top: 1em;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.5em;
+      font-size: 16px; /* Prevents iOS zoom */
+      margin-bottom: 1em;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      font-size: 16px; /* Prevents iOS zoom */
+      padding: 0.7em 1.2em;
+      background-color: black;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .checkbox {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      margin-bottom: 1.5em;
+    }
+
+    .checkbox input {
+      margin-right: 0.5em;
+    }
+
+    #rsvp-response {
+      margin-top: 1em;
+      display: none;
+    }
+
+    .followup {
+      font-size: 16px;
+      margin-top: 2em;
+      border-top: 1px solid #ddd;
+      padding-top: 1.5em;
+    }
+
+    .followup a {
+      display: inline-block;
+      margin-top: 0.5em;
+      padding: 0.7em 1.2em;
+      background: white;
+      color: black;
+      border: 1px solid black;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Mutual Core Launch RSVP</h1>
+  <p>Join us for an intimate unveiling. Please RSVP below:</p>
+
+  <form id="rsvp-form">
+    <input type="text" name="name" placeholder="Your name" required />
+    <input type="email" name="email" placeholder="Your email" required />
+    <textarea name="message" placeholder="Anything we should know?" rows="3"></textarea>
+
+    <label class="checkbox">
+      <input type="checkbox" id="plus-one" />
+      I'm going to bring a +1
+    </label>
+
+    <button type="submit">Confirm RSVP</button>
+  </form>
+
+  <p id="rsvp-response"></p>
+
+  <div class="followup">
+    <p>I can't attend this launch but I would love to schedule a private listening.</p>
+    <a href="mailto:hello@limpatience.com?subject=I'd like to schedule a private listening of your speakers Mutual Core">
+      Email us to schedule
+    </a>
+  </div>
+
+  <script>
+    const form = document.getElementById('rsvp-form');
+    const responseEl = document.getElementById('rsvp-response');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
+      const plusOne = document.getElementById('plus-one').checked;
+
+      // Save to Supabase
+      const supabaseRes = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, plus_one: plusOne })
+      });
+
+      const supabaseResult = await supabaseRes.json();
+
+      if (!supabaseResult.success) {
+        responseEl.style.color = 'red';
+        responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
+        responseEl.style.display = 'block';
+        return;
+      }
+
+      // Send confirmation email
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+
+      responseEl.style.color = 'green';
+      responseEl.textContent = "✅ You're all set! We'll see you there.";
+      responseEl.style.display = 'block';
+      form.reset();
     });
-
-    responseEl.style.color = 'green';
-    responseEl.textContent = "✅ You're all set! We'll see you there.";
-    responseEl.style.display = 'block';
-    form.reset();
-  });
-</script>
-
+  </script>
 </body>
 </html>
