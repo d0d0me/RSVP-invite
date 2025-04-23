@@ -26,59 +26,74 @@
     
     <div id="rsvp">
       <h3>RSVP</h3>
-      <form>
-        <input type="text" name="name" placeholder="Your name" required />
-        <input type="email" name="email" placeholder="Your email" required />
-        <textarea name="message" placeholder="Anything we should know?" rows="3"></textarea>
-        <button type="submit">Confirm RSVP</button>
-      </form>
+      <form id="rsvp-form" style="margin-top: 1em;">
+  <input type="text" name="name" placeholder="Your name" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
+  <input type="email" name="email" placeholder="Your email" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
+  <textarea name="message" placeholder="Anything we should know?" rows="3" style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;"></textarea>
+  
+  <label style="display: flex; align-items: center; font-size: 16px; margin-bottom: 1em;">
+    <input type="checkbox" id="plus-one" style="margin-right: 0.5em;" />
+    I'm going to bring a +1
+  </label>
+  
+  <button type="submit" style="padding: 0.7em 1.2em; background: black; color: white; border: none; font-size: 16px; cursor: pointer;">
+    Confirm RSVP
+  </button>
+</form>
 
-      <div id="thank-you" class="fade" style="display: none; margin-top: 1em;">
-        <p>Thank you for RSVPing! We’re excited to see you there.</p>
-      </div>
-    </div>
-  </div>
+<p id="rsvp-response" style="margin-top: 1em; color: green; display: none;"></p>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+<hr style="margin: 2em 0;" />
 
-    const supabase = createClient(
-      'https://einixxudtbxnrmgrnexd.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVpbml4eHVkdGJ4bnJtZ3JuZXhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyODM2OTMsImV4cCI6MjA2MDg1OTY5M30.JWbg2KXdDiSmToYik4IpSH48hY9komsZYcSZ_uKUXwA'
-    )
+<div style="font-size: 16px;">
+  <p>I can't attend this launch but I would love to schedule a private listening.</p>
+  <a href="mailto:hello@limpatience.com?subject=I'd like to schedule a private listening of your speakers Mutual Core"
+     style="display: inline-block; padding: 0.7em 1.2em; background: white; color: black; border: 1px solid black; border-radius: 4px; text-decoration: none;">
+    Email us to schedule
+  </a>
+</div>
 
-    const form = document.querySelector('form')
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault()
+<script>
+  const form = document.getElementById('rsvp-form');
+  const responseEl = document.getElementById('rsvp-response');
 
-      const name = form.name.value.trim()
-      const email = form.email.value.trim()
-      const message = form.message.value.trim()
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-      const { error } = await supabase
-        .from('rsvps')
-        .insert([{ name, email, message }])
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+    const plusOne = document.getElementById('plus-one').checked;
 
-      if (error) {
-        console.error('Supabase error:', error)
-        alert('Something went wrong: ' + error.message)
-      } else {
-        // send confirmation email via MailerSend API route
-        await fetch('/api/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email })
-        })
+    // Send RSVP to Supabase
+    const supabaseRes = await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, message, plus_one: plusOne })
+    });
 
-        // show thank you message
-        form.style.display = 'none'
-        const thankYou = document.getElementById('thank-you')
-        thankYou.style.display = 'block'
-        setTimeout(() => {
-          thankYou.classList.add('show')
-        }, 10)
-      }
-    })
-  </script>
+    const supabaseResult = await supabaseRes.json();
+
+    if (!supabaseResult.success) {
+      responseEl.style.color = 'red';
+      responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
+      responseEl.style.display = 'block';
+      return;
+    }
+
+    // Send confirmation email via MailerSend
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+
+    responseEl.style.color = 'green';
+    responseEl.textContent = "✅ You're all set! We'll see you there.";
+    responseEl.style.display = 'block';
+    form.reset();
+  });
+</script>
+
 </body>
 </html>
