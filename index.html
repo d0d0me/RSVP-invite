@@ -86,7 +86,7 @@
       }
 
       // Send confirmation email via MailerSend
-      await fetch('/api/send-email', {
+      await fetch('/api/sendMail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email })
