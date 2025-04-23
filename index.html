@@ -53,47 +53,51 @@
   </a>
 </div>
 
-<script>
-  const form = document.getElementById('rsvp-form');
-  const responseEl = document.getElementById('rsvp-response');
+    </div> <!-- closes RSVP content -->
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  </div> <!-- closes .content -->
 
-    const name = form.name.value.trim();
-    const email = form.email.value.trim();
-    const message = form.message.value.trim();
-    const plusOne = document.getElementById('plus-one').checked;
+  <script>
+    const form = document.getElementById('rsvp-form');
+    const responseEl = document.getElementById('rsvp-response');
 
-    // Send RSVP to Supabase
-    const supabaseRes = await fetch('/api/rsvp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message, plus_one: plusOne })
-    });
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    const supabaseResult = await supabaseRes.json();
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
+      const plusOne = document.getElementById('plus-one').checked;
 
-    if (!supabaseResult.success) {
-      responseEl.style.color = 'red';
-      responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
+      // Send RSVP to Supabase
+      const supabaseRes = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, plus_one: plusOne })
+      });
+
+      const supabaseResult = await supabaseRes.json();
+
+      if (!supabaseResult.success) {
+        responseEl.style.color = 'red';
+        responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
+        responseEl.style.display = 'block';
+        return;
+      }
+
+      // Send confirmation email via MailerSend
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+
+      responseEl.style.color = 'green';
+      responseEl.textContent = "✅ You're all set! We'll see you there.";
       responseEl.style.display = 'block';
-      return;
-    }
-
-    // Send confirmation email via MailerSend
-    await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email })
+      form.reset();
     });
-
-    responseEl.style.color = 'green';
-    responseEl.textContent = "✅ You're all set! We'll see you there.";
-    responseEl.style.display = 'block';
-    form.reset();
-  });
-</script>
-
+  </script>
 </body>
 </html>
+
