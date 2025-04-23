@@ -16,7 +16,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { name, email, message, plus_one } = req.body;
+    const { name, email, message, guest_count } = req.body;
 
     if (!name || !email) {
       return res.status(400).json({ success: false, error: 'Missing required fields' });
@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
 
     const { error } = await supabase
       .from('rsvps')
-      .insert([{ name, email, message, plus_one }]);
+      .insert([{ name, email, message, guest_count }]);
 
     if (error) {
       console.error('❌ Supabase insert error:', error.message);
