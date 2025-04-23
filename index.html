@@ -1,65 +1,99 @@
-<div id="silent-auction" style="font-family: sans-serif; padding: 1em; background: #f5f5f5; border: 1px solid #ccc; border-radius: 6px;">
-  <h3 style="margin-top: 0;">Silent Auction</h3>
-  <p><strong>Highest Bid:</strong> <span id="highest-bid">Loading...</span></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>You're Invited</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="hero">
+    <img src="your-image.jpg" alt="Event Image" />
+    <div class="overlay">
+      <h1>Mutual Core Launch</h1>
+      <p>Saturday, May 10 · 5–8PM · Kingston, NY</p>
+      <a href="#rsvp" class="btn">RSVP Now</a>
+    </div>
+  </div>
 
-  <form id="bid-form" style="margin-top: 1em;">
-    <input type="text" id="bid-name" placeholder="Your name" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em;" />
-    <input type="email" id="bid-email" placeholder="Your email" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em;" />
-    <input type="number" id="bid-amount" placeholder="Your bid ($)" step="0.01" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em;" />
-    <button type="submit" style="padding: 0.7em 1.2em; background: black; color: white; border: none; cursor: pointer;">Submit Bid</button>
-  </form>
+  <div class="content">
+    <h2>About the Event</h2>
+    <p>Join us for a quiet unveiling among friends — an opportunity to experience our ceramic loudspeakers up close, hear the sound they hold, and celebrate the years of work behind them.</p>
+    
+    <h3>Location</h3>
+    <p>45 Pine Grove Avenue, Kingston, NY</p>
+    <iframe src="https://maps.google.com/maps?q=45 Pine Grove Ave, Kingston, NY&output=embed" frameborder="0" class="map"></iframe>
+    
+    <div id="rsvp">
+      <h3>RSVP</h3>
+      <form id="rsvp-form" style="margin-top: 1em;">
+  <input type="text" name="name" placeholder="Your name" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
+  <input type="email" name="email" placeholder="Your email" required style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;" />
+  <textarea name="message" placeholder="Anything we should know?" rows="3" style="margin-bottom: 0.5em; width: 100%; padding: 0.5em; font-size: 16px;"></textarea>
+  
+  <label style="display: flex; align-items: center; font-size: 16px; margin-bottom: 1em;">
+    <input type="checkbox" id="plus-one" style="margin-right: 0.5em;" />
+    I'm going to bring a +1
+  </label>
+  
+  <button type="submit" style="padding: 0.7em 1.2em; background: black; color: white; border: none; font-size: 16px; cursor: pointer;">
+    Confirm RSVP
+  </button>
+</form>
 
-  <p id="bid-response" style="margin-top: 1em; color: green; display: none;"></p>
+<p id="rsvp-response" style="margin-top: 1em; color: green; display: none;"></p>
+
+<hr style="margin: 2em 0;" />
+
+<div style="font-size: 16px;">
+  <p>I can't attend this launch but I would love to schedule a private listening.</p>
+  <a href="mailto:hello@limpatience.com?subject=I'd like to schedule a private listening of your speakers Mutual Core"
+     style="display: inline-block; padding: 0.7em 1.2em; background: white; color: black; border: 1px solid black; border-radius: 4px; text-decoration: none;">
+    Email us to schedule
+  </a>
 </div>
 
 <script>
-  const product = "Chronoformosis"; // Replace this with your actual product name
-  const highestBidEl = document.getElementById('highest-bid');
-  const bidForm = document.getElementById('bid-form');
-  const responseEl = document.getElementById('bid-response');
+  const form = document.getElementById('rsvp-form');
+  const responseEl = document.getElementById('rsvp-response');
 
-  const apiBase = "https://silent-auction-vert.vercel.app/api/bid"; // ✅ fixed endpoint
-
-  async function loadHighestBid() {
-    try {
-      const res = await fetch(`${apiBase}?product=${encodeURIComponent(product)}`);
-      const data = await res.json();
-      if (data.highestBid) {
-        highestBidEl.textContent = `$${parseFloat(data.highestBid.bidAmount).toFixed(2)} by ${data.highestBid.name}`;
-      } else {
-        highestBidEl.textContent = "No bids yet.";
-      }
-    } catch (err) {
-      highestBidEl.textContent = "Unable to load.";
-    }
-  }
-
-  bidForm.addEventListener('submit', async (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const name = document.getElementById('bid-name').value.trim();
-    const email = document.getElementById('bid-email').value.trim();
-    const bidAmount = document.getElementById('bid-amount').value.trim();
+    const name = form.name.value.trim();
+    const email = form.email.value.trim();
+    const message = form.message.value.trim();
+    const plusOne = document.getElementById('plus-one').checked;
 
-    const res = await fetch(apiBase, {
+    // Send RSVP to Supabase
+    const supabaseRes = await fetch('/api/rsvp', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, bidAmount, product })
+      body: JSON.stringify({ name, email, message, plus_one: plusOne })
     });
 
-    const result = await res.json();
-    if (result.success) {
-      responseEl.style.color = 'green';
-      responseEl.textContent = "✅ Your bid has been placed!";
-      responseEl.style.display = 'block';
-      bidForm.reset();
-      loadHighestBid();
-    } else {
-      responseEl.style.color = 'red';
-      responseEl.textContent = "❌ " + (result.error || "Something went wrong.");
-      responseEl.style.display = 'block';
-    }
-  });
+    const supabaseResult = await supabaseRes.json();
 
-  loadHighestBid();
+    if (!supabaseResult.success) {
+      responseEl.style.color = 'red';
+      responseEl.textContent = "❌ " + (supabaseResult.error || "Something went wrong.");
+      responseEl.style.display = 'block';
+      return;
+    }
+
+    // Send confirmation email via MailerSend
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+
+    responseEl.style.color = 'green';
+    responseEl.textContent = "✅ You're all set! We'll see you there.";
+    responseEl.style.display = 'block';
+    form.reset();
+  });
 </script>
+
+</body>
+</html>
