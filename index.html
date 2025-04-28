@@ -218,48 +218,55 @@
   </div>
 
   <script>
-    const form = document.getElementById('rsvp-form');
-    const responseEl = document.getElementById('rsvp-response');
+const form = document.getElementById('rsvp-form');
+const responseEl = document.getElementById('rsvp-response');
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-      const name = form.name.value.trim();
-      const email = form.email.value.trim();
-      const message = form.message.value.trim();
-      const guestCount = parseInt(document.getElementById('guest-count').value, 10);
+  const name = form.name.value.trim();
+  const email = form.email.value.trim();
+  const message = form.message.value.trim();
+  const guestCount = parseInt(document.getElementById('guest-count').value, 10);
 
-      const supabaseRes = await fetch('/api/rsvp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message, guest_count: guestCount })
-      });
+  // ✨ Manual validation for email ✨
+  if (!email) {
+    alert('Please enter a valid email address.');
+    return;
+  }
 
-      const supabaseResult = await supabaseRes.json();
+  const supabaseRes = await fetch('/api/rsvp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, message, guest_count: guestCount })
+  });
 
-      if (!supabaseResult.success) {
-        responseEl.textContent = "Something went wrong. Please try again.";
-        responseEl.style.display = 'block';
-        return;
-      }
+  const supabaseResult = await supabaseRes.json();
 
-      await fetch('/api/sendMail', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
-      });
+  if (!supabaseResult.success) {
+    responseEl.textContent = "Something went wrong. Please try again.";
+    responseEl.style.display = 'block';
+    return;
+  }
 
-      form.style.display = 'none';
-      responseEl.textContent = "You're on the list. We can't wait to share this moment with you.";
-      responseEl.style.display = 'block';
+  await fetch('/api/sendMail', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email })
+  });
 
-      setTimeout(() => {
-        form.reset();
-        responseEl.style.display = 'none';
-        form.style.display = 'block';
-      }, 2000);
-    });
-  </script>
+  form.style.display = 'none';
+  responseEl.textContent = "You're on the list. We can't wait to share this moment with you.";
+  responseEl.style.display = 'block';
+
+  setTimeout(() => {
+    form.reset();
+    responseEl.style.display = 'none';
+    form.style.display = 'block';
+  }, 2000);
+});
+</script>
+
   <footer style="margin-top: 4em; padding: 2em 1em; text-align: center;">
   <img src="https://cdn.shopify.com/s/files/1/0450/6959/8869/files/impatience_Logo_black_15ee75d5-a585-47c9-bd67-22dc8237ff9d.png?v=1677552889" alt="L’Impatience logo" style="max-width: 100px; margin-bottom: 1em; opacity: 0.8;" />
   <p style="font-size: 0.85em; color: #666;">
