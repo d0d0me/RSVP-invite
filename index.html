@@ -10,10 +10,9 @@
 
   <style>
     * {
-  box-sizing: border-box;
-}
+      box-sizing: border-box;
+    }
 
-    
     body {
       font-family: 'Inconsolata', monospace;
       text-align: center;
@@ -26,7 +25,7 @@
 
     .hero {
       position: relative;
-      height: 100vh;
+      min-height: 120vh;
       width: 100%;
       overflow: hidden;
       background-color: black;
@@ -35,13 +34,14 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
+      padding: 2em 1em;
     }
 
     .hero-logo {
-  max-width: 140px;
-  margin-bottom: 1.2em;
-  opacity: 0.85;
-}
+      max-width: 140px;
+      margin-bottom: 1.2em;
+      opacity: 0.85;
+    }
 
     .hero-image {
       position: absolute;
@@ -60,6 +60,8 @@
     .overlay {
       position: relative;
       z-index: 1;
+      max-width: 600px;
+      width: 100%;
     }
 
     .overlay h1,
@@ -95,6 +97,7 @@
 
     form {
       text-align: center;
+      margin-top: 1.5em;
     }
 
     input, textarea, select {
@@ -152,63 +155,59 @@
     }
 
     .responsive-wrapper {
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 1em;
-  box-sizing: border-box;
-}
-
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1em;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
 
   <div class="hero">
-  <div class="hero-image"></div>
-  <div class="overlay">
-    <a href="https://www.limpatience.com" target="_blank"><img src="https://cdn.shopify.com/s/files/1/0450/6959/8869/files/Sigle_limpatience_White.png?v=1744998173" alt="L’Impatience logo" class="hero-logo" /></a>
-    <h1>Mutual Core Private Launch</h1>
-    <p>Saturday, May 10 · 5–8PM · Kingston, NY</p>
-    <a href="#rsvp" class="btn">RSVP Now</a>
+    <div class="hero-image"></div>
+    <div class="overlay">
+      <a href="https://www.limpatience.com" target="_blank">
+        <img src="https://cdn.shopify.com/s/files/1/0450/6959/8869/files/Sigle_limpatience_White.png?v=1744998173" alt="L’Impatience logo" class="hero-logo" />
+      </a>
+      <h1>Mutual Core Private Launch</h1>
+      <p>Saturday, May 10 · 5–8PM · Kingston, NY</p>
+
+      <form id="rsvp-form">
+        <input type="text" name="name" placeholder="Your name" required />
+        <input type="email" name="email" placeholder="Your email" required />
+        <textarea name="message" placeholder="Write your message here (Optional)" rows="3"></textarea>
+
+        <label for="guest-count" style="font-size: 16px; display: block; margin-bottom: 1em;">
+          Number of guests (including you):
+        </label>
+        <select id="guest-count" name="guest-count">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+
+        <button type="submit">Confirm RSVP</button>
+      </form>
+
+      <p id="rsvp-response"></p>
+    </div>
   </div>
-</div>
 
   <div class="content responsive-wrapper">
     <h2>About the Event</h2>
     <p>Join us for an intimate unveiling — an opportunity to experience the final expression of our ceramic loudspeakers before their debut at ICFF. Five pairs will be available for pre-order at special launch pricing.</p>
 
     <h3>Location</h3>
-<p><a href="https://maps.app.goo.gl/JiSL6sMrzZLQvyyg6" target="_blank" style="text-decoration: none; color: inherit;">The Fuller Building</a></p>
-<p><a href="https://maps.app.goo.gl/JiSL6sMrzZLQvyyg6" target="_blank" style="text-decoration: none; color: inherit;">45 Pine Grove Avenue, Kingston, NY</a></p>
+    <p><a href="https://maps.app.goo.gl/JiSL6sMrzZLQvyyg6" target="_blank" style="text-decoration: none; color: inherit;">The Fuller Building</a></p>
+    <p><a href="https://maps.app.goo.gl/JiSL6sMrzZLQvyyg6" target="_blank" style="text-decoration: none; color: inherit;">45 Pine Grove Avenue, Kingston, NY</a></p>
     <iframe src="https://maps.google.com/maps?q=45 Pine Grove Ave, Kingston, NY&output=embed" class="map"></iframe>
 
-    <div id="rsvp">
-      <h3>RSVP</h3>
-      <div id="rsvp-container">
-        <form id="rsvp-form">
-          <input type="text" name="name" placeholder="Your name" required />
-          <input type="email" name="email" placeholder="Your email" required />
-          <textarea name="message" placeholder="Write your message here (Optional)" rows="3"></textarea>
-
-          <label for="guest-count" style="font-size: 16px; display: block; margin-bottom: 1em;">
-            Number of guests (including you):
-          </label>
-          <select id="guest-count" name="guest-count">
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-          </select>
-
-          <button type="submit">Confirm RSVP</button>
-        </form>
-
-        <p id="rsvp-response"></p>
-      </div>
-
+    <div id="rsvp-container">
       <hr />
-
       <div class="followup">
         <p>I can't attend this launch but I would love to schedule a private listening.</p>
         <a href="mailto:hello@limpatience.com?subject=I'd like to schedule a private listening of your speakers Mutual Core">
@@ -219,62 +218,63 @@
   </div>
 
   <script>
-const form = document.getElementById('rsvp-form');
-const responseEl = document.getElementById('rsvp-response');
+    const form = document.getElementById('rsvp-form');
+    const responseEl = document.getElementById('rsvp-response');
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  const name = form.name.value.trim();
-  const email = form.email.value.trim();
-  const message = form.message.value.trim();
-  const guestCount = parseInt(document.getElementById('guest-count').value, 10);
+      const name = form.name.value.trim();
+      const email = form.email.value.trim();
+      const message = form.message.value.trim();
+      const guestCount = parseInt(document.getElementById('guest-count').value, 10);
 
-  // ✨ Manual validation for email ✨
-  if (!email) {
-    alert('Please enter a valid email address.');
-    return;
-  }
+      if (!email) {
+        alert('Please enter a valid email address.');
+        return;
+      }
 
-  const supabaseRes = await fetch('/api/rsvp', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, message, guest_count: guestCount })
-  });
+      const supabaseRes = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, message, guest_count: guestCount })
+      });
 
-  const supabaseResult = await supabaseRes.json();
+      const supabaseResult = await supabaseRes.json();
 
-  if (!supabaseResult.success) {
-    responseEl.textContent = "Something went wrong. Please try again.";
-    responseEl.style.display = 'block';
-    return;
-  }
+      if (!supabaseResult.success) {
+        responseEl.textContent = "Something went wrong. Please try again.";
+        responseEl.style.display = 'block';
+        return;
+      }
 
-  await fetch('/api/sendMail', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email })
-  });
+      await fetch('/api/sendMail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
 
-  form.style.display = 'none';
-  responseEl.textContent = "You're on the list. We can't wait to share this moment with you.";
-  responseEl.style.display = 'block';
+      form.style.display = 'none';
+      responseEl.textContent = "You're on the list. We can't wait to share this moment with you.";
+      responseEl.style.display = 'block';
 
-  setTimeout(() => {
-    form.reset();
-    responseEl.style.display = 'none';
-    form.style.display = 'block';
-  }, 2000);
-});
-</script>
+      setTimeout(() => {
+        form.reset();
+        responseEl.style.display = 'none';
+        form.style.display = 'block';
+      }, 2000);
+    });
+  </script>
 
   <footer style="margin-top: 4em; padding: 2em 1em; text-align: center;">
     <p><a href="https://www.limpatience.com" target="_blank" style="text-color:#232323;text-decoration:underline;">www.limpatience.com</a></p>
-  <a href="https://www.limpatience.com" target="_blank"><img src="https://cdn.shopify.com/s/files/1/0450/6959/8869/files/impatience_Logo_black_15ee75d5-a585-47c9-bd67-22dc8237ff9d.png?v=1677552889" alt="L’Impatience logo" style="max-width: 100px; margin-bottom: 1em; opacity: 0.8;" /></a>
-  <p style="font-size: 0.85em; color: #666;">
-    This is a private event with limited availability.
-  </p>
-</footer>
+    <a href="https://www.limpatience.com" target="_blank">
+      <img src="https://cdn.shopify.com/s/files/1/0450/6959/8869/files/impatience_Logo_black_15ee75d5-a585-47c9-bd67-22dc8237ff9d.png?v=1677552889" alt="L’Impatience logo" style="max-width: 100px; margin-bottom: 1em; opacity: 0.8;" />
+    </a>
+    <p style="font-size: 0.85em; color: #666;">
+      This is a private event with limited availability.
+    </p>
+  </footer>
 
 </body>
 </html>
