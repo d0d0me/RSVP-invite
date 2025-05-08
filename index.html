@@ -24,18 +24,18 @@
     }
 
     .hero {
-      position: relative;
-      min-height: 120vh;
-      width: 100%;
-      overflow: hidden;
-      background-color: black;
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 2em 1em;
-    }
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 1em;
+  overflow: hidden;
+}
+
 
     .hero-logo {
       max-width: 140px;
@@ -58,11 +58,15 @@
     }
 
     .overlay {
-      position: relative;
-      z-index: 1;
-      max-width: 600px;
-      width: 100%;
-    }
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 
     .overlay h1,
     .overlay p {
